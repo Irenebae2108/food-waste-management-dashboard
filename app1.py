@@ -61,6 +61,9 @@ df = df.merge(
 df["Expiry_Date"] = pd.to_datetime(df["Expiry_Date"], errors="coerce")
 df["Timestamp"] = pd.to_datetime(df["Timestamp"], errors="coerce")
 
+df = df.rename(columns={
+    "Provider_Type_y": "Provider_Type"
+})
 # ---------------------------------------------------
 # Dashboard Title
 # ---------------------------------------------------
