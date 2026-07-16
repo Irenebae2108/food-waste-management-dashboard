@@ -16,55 +16,26 @@ st.set_page_config(
     layout="wide"
 )
 
-conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="pihuri21",
-    database="food_waste"
+providers = pd.read_csv("providers_data.csv")
+receivers = pd.read_csv("receivers_data.csv")
+food = pd.read_csv("food_listings_data.csv")
+claims = pd.read_csv("claims_data.csv")
+
+df = claims.merge(food, on="Food_ID", how="left")
+
+df = df.merge(
+    providers,
+    on="Provider_ID",
+    how="left",
+    suffixes=("", "_Provider")
 )
 
-query = """
-SELECT
-
-c.Claim_ID,
-c.Status,
-c.Timestamp,
-
-f.Food_ID,
-f.Food_Name,
-f.Quantity,
-f.Expiry_Date,
-f.Food_Type,
-f.Meal_Type,
-
-p.Provider_ID,
-p.Name AS Provider_Name,
-p.Type AS Provider_Type,
-p.City AS Provider_City,
-p.Contact AS Provider_Contact,
-
-r.Receiver_ID,
-r.Name AS Receiver_Name,
-r.Type AS Receiver_Type,
-r.City AS Receiver_City,
-r.Contact AS Receiver_Contact
-
-FROM claims_data c
-
-JOIN food_listings_data f
-ON c.Food_ID=f.Food_ID
-
-JOIN providers_data p
-ON f.Provider_ID=p.Provider_ID
-
-JOIN receivers_data r
-ON c.Receiver_ID=r.Receiver_ID
-"""
-
-df = pd.read_sql(query, conn)
-
-conn.close()
-
+df = df.merge(
+    receivers,
+    on="Receiver_ID",
+    how="left",
+    suffixes=("", "_Receiver")
+)
 st.title("🍲 Food Waste Management Dashboard")
 
 st.dataframe(df.head())
